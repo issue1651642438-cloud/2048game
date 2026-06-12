@@ -267,10 +267,13 @@ bgMusic.loop = true;
 bgMusic.volume = 0.15;
 let bgMusicPlaying = false;
 
-/** 首次用户交互时初始化音效系统和背景音乐 */
+/** 首次交互时初始化音效（只初始化SDK，不自动播放音乐） */
 function initAudio() {
   SoundFX.init();
+}
 
+/** 游戏中的第一次操作（按键/触控）时自动播放背景音乐 */
+function startBgMusic() {
   if (bgMusicPlaying) return;
   bgMusicPlaying = true;
   bgMusic.play().catch(() => {});
@@ -281,12 +284,23 @@ function initAudio() {
 
 /** 切换背景音乐 */
 function toggleMusic() {
-  if (bgMusic.paused) {
+  SoundFX.init();  // 确保音效引擎已启动
+
+  if (!bgMusicPlaying) {
+    // 音乐还未播放过 → 开始播放
+    bgMusicPlaying = true;
+    bgMusic.play().catch(() => {});
+    musicBtn.textContent = '🔊';
+    musicBtn.classList.remove('music-off');
+    musicBtn.classList.add('music-on');
+  } else if (bgMusic.paused) {
+    // 已暂停 → 恢复
     bgMusic.play().catch(() => {});
     musicBtn.textContent = '🔊';
     musicBtn.classList.remove('music-off');
     musicBtn.classList.add('music-on');
   } else {
+    // 正在播放 → 暂停
     bgMusic.pause();
     musicBtn.textContent = '🔇';
     musicBtn.classList.remove('music-on');
@@ -294,9 +308,14 @@ function toggleMusic() {
   }
 }
 
-// 任何用户交互都触发音频初始化
-document.addEventListener('click', initAudio, { once: true });
-document.addEventListener('keydown', initAudio, { once: true });
+// 首次按键/触控时自动播放背景音乐
+function firstGameInteraction() {
+  startBgMusic();
+  document.removeEventListener('keydown', firstGameInteraction);
+  document.removeEventListener('touchstart', firstGameInteraction);
+}
+document.addEventListener('keydown', firstGameInteraction);
+document.addEventListener('touchstart', firstGameInteraction);
 
 // =========================================================
 // 9. Toast 提示
