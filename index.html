@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>2048 - 注册登录版</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============================
+       认证区域
+       ============================ -->
+  <div id="auth-section">
+    <div class="auth-card">
+      <h1 class="auth-title">2048</h1>
+      <p class="auth-subtitle">登录后可保存你的最高分</p>
+
+      <div class="auth-tabs">
+        <button class="tab-btn active" data-tab="login">登录</button>
+        <button class="tab-btn" data-tab="register">注册</button>
+      </div>
+
+      <!-- 登录 -->
+      <form id="login-form" class="auth-form active">
+        <input type="email"     id="login-email"    placeholder="邮箱地址"                required>
+        <input type="password"  id="login-password" placeholder="密码"                    required>
+        <div id="login-error" class="error-msg"></div>
+        <button type="submit" class="auth-btn">登录</button>
+      </form>
+
+      <!-- 注册 -->
+      <form id="register-form" class="auth-form">
+        <input type="email"     id="register-email"    placeholder="邮箱地址"              required>
+        <input type="password"  id="register-password" placeholder="密码（至少 6 位）"     required minlength="6">
+        <div id="register-error" class="error-msg"></div>
+        <button type="submit" class="auth-btn">注册</button>
+      </form>
+
+      <div class="divider"><span>或</span></div>
+      <button id="guest-btn" class="guest-btn">🎮 访客模式</button>
+    </div>
+  </div>
+
+  <!-- ============================
+       游戏区域
+       ============================ -->
+  <div id="game-section" class="hidden">
+    <div class="container">
+      <div class="heading">
+        <h1 class="title">2048</h1>
+        <div class="scores-container">
+          <div class="score-box">
+            <div class="score-label">分数</div>
+            <div id="score" class="score-value">0</div>
+          </div>
+          <div class="score-box">
+            <div class="score-label">最高</div>
+            <div id="best-score" class="score-value">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subheading">
+        <div id="user-info"></div>
+        <div class="controls">
+          <button id="new-game-btn"  class="game-btn">新游戏</button>
+          <button id="logout-btn"    class="game-btn logout-btn">退出</button>
+        </div>
+      </div>
+
+      <div id="game-container" class="game-container">
+        <div id="grid-background" class="grid-background"></div>
+        <div id="tile-container" class="tile-container"></div>
+
+        <div id="game-over-overlay" class="game-over-overlay hidden">
+          <div class="game-over-content">
+            <h2>游戏结束！</h2>
+            <p id="final-score">得分：0</p>
+            <button id="restart-btn" class="game-btn large">再来一局</button>
+          </div>
+        </div>
+
+        <div id="win-overlay" class="game-over-overlay hidden">
+          <div class="game-over-content">
+            <h2>🎉 你赢了！</h2>
+            <button id="continue-btn" class="game-btn large">继续挑战</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="game-instructions">方向键 ← ↑ → ↓ 或滑动控制方块移动</p>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (Compat 模式) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
