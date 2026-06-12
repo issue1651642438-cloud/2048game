@@ -675,6 +675,11 @@ body {
     padding: 12px 8px;
     font-size: 13px;
   }
+
+  .game-footer {
+    margin-top: 28px;
+    padding-bottom: 12px;
+  }
 }
 
 /* 主流手机竖屏 (375px ~ 430px) */
@@ -712,6 +717,11 @@ body {
   .bottom-btn {
     padding: 11px 6px;
     font-size: 12px;
+  }
+
+  .game-footer {
+    margin-top: 20px;
+    padding-bottom: 10px;
   }
 }
 
@@ -762,5 +772,10 @@ body {
   .bottom-btn {
     padding: 10px 4px;
     font-size: 11px;
+  }
+
+  .game-footer {
+    margin-top: 16px;
+    padding-bottom: 8px;
   }
 }
