@@ -64,6 +64,8 @@
       <div class="subheading">
         <div id="user-info"></div>
         <div class="controls">
+          <button id="music-btn"     class="game-btn music-on" title="背景音乐">🔊</button>
+          <button id="share-btn"     class="game-btn share-btn" title="分享">📋</button>
           <button id="new-game-btn"  class="game-btn">新游戏</button>
           <button id="logout-btn"    class="game-btn logout-btn">退出</button>
         </div>
@@ -92,6 +94,9 @@
       <p class="game-instructions">方向键 ← ↑ → ↓ 或滑动控制方块移动</p>
     </div>
   </div>
+
+  <!-- Toast 提示 -->
+  <div id="toast" class="toast hidden"></div>
 
   <!-- Firebase SDK (Compat 模式) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>

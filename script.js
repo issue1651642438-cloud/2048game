@@ -41,9 +41,17 @@ const winOverlay       = $('win-overlay');
 const newGameBtn       = $('new-game-btn');
 const restartBtn       = $('restart-btn');
 const continueBtn      = $('continue-btn');
+const musicBtn         = $('music-btn');
+const shareBtn         = $('share-btn');
+const toastEl          = $('toast');
 
 // =========================================================
-// 3. Auth 选项卡
+// 3. 页面加载时强制登出（无论之前是否登录过）
+// =========================================================
+auth.signOut();
+
+// =========================================================
+// 4. Auth 选项卡
 // =========================================================
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -57,7 +65,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // =========================================================
-// 4. 认证方法
+// 5. 认证方法
 // =========================================================
 
 /* ---- 登录 ---- */
@@ -141,18 +149,25 @@ auth.onAuthStateChanged(user => {
 });
 
 // =========================================================
-// 5. 音效管理器 (Web Audio API)
+// 6. 音效管理器 (Web Audio API)
 // =========================================================
 const SoundFX = {
   _ctx: null,
+  _ready: false,
 
-  _ensure() {
-    if (!this._ctx) {
+  /** 首次用户交互时初始化（由页面的 click/keydown 触发） */
+  init() {
+    if (this._ready) return;
+    try {
       const C = window.AudioContext || window.webkitAudioContext;
       this._ctx = new C();
-    }
-    // 如果 AudioContext 是 suspended 状态，恢复它
-    if (this._ctx.state === 'suspended') {
+      this._ready = true;
+    } catch (_) {}
+  },
+
+  _ensure() {
+    if (!this._ready) this.init();
+    if (this._ctx && this._ctx.state === 'suspended') {
       this._ctx.resume();
     }
   },
@@ -222,26 +237,63 @@ const SoundFX = {
 };
 
 // =========================================================
-// 6. 背景音乐
+// 7. 背景音乐
 // =========================================================
-let bgMusicStarted = false;
 const bgMusic = new Audio('./gin120_ed2-mr-raindrop.mp3');
 bgMusic.loop = true;
 bgMusic.volume = 0.15;
+let bgMusicPlaying = false;
 
-/** 首次用户交互时启动背景音乐 */
-function tryStartBgMusic() {
-  if (bgMusicStarted) return;
-  bgMusicStarted = true;
-  bgMusic.play().catch(() => {}); // 自动播放可能被拦截
+/** 首次用户交互时初始化音效系统和背景音乐 */
+function initAudio() {
+  SoundFX.init();
+
+  if (bgMusicPlaying) return;
+  bgMusicPlaying = true;
+  bgMusic.play().catch(() => {});
+  musicBtn.textContent = '🔊';
+  musicBtn.classList.remove('music-off');
+  musicBtn.classList.add('music-on');
 }
 
-// 任何点击/按键都尝试启动音乐
-document.addEventListener('click', tryStartBgMusic, { once: true });
-document.addEventListener('keydown', tryStartBgMusic, { once: true });
+/** 切换背景音乐 */
+function toggleMusic() {
+  if (bgMusic.paused) {
+    bgMusic.play().catch(() => {});
+    musicBtn.textContent = '🔊';
+    musicBtn.classList.remove('music-off');
+    musicBtn.classList.add('music-on');
+  } else {
+    bgMusic.pause();
+    musicBtn.textContent = '🔇';
+    musicBtn.classList.remove('music-on');
+    musicBtn.classList.add('music-off');
+  }
+}
+
+// 任何用户交互都触发音频初始化
+document.addEventListener('click', initAudio, { once: true });
+document.addEventListener('keydown', initAudio, { once: true });
+
+// =========================================================
+// 8. Toast 提示
+// =========================================================
+let toastTimer = null;
+function showToast(msg) {
+  if (toastTimer) clearTimeout(toastTimer);
+  toastEl.textContent = msg;
+  toastEl.classList.remove('hidden');
+  // 重新触发动画
+  toastEl.style.animation = 'none';
+  void toastEl.offsetHeight;
+  toastEl.style.animation = '';
+  toastTimer = setTimeout(() => {
+    toastEl.classList.add('hidden');
+  }, 2000);
+}
 
 // ========================================================
-// 7. 方块身份 Cell（用于平滑动画追踪）
+// 9. 方块身份 Cell（用于平滑动画追踪）
 // ========================================================
 let _nextCellId = 0;
 class Cell {
@@ -252,7 +304,7 @@ class Cell {
 }
 
 // ========================================================
-// 8. 2048 游戏
+// 10. 2048 游戏
 // ========================================================
 const SIZE = 4;
 const TILE_CLASSES = [
@@ -568,7 +620,7 @@ class Game2048 {
 }
 
 // ========================================================
-// 10. 键盘控制
+// 11. 键盘控制
 // ========================================================
 document.addEventListener('keydown', e => {
   const map = {
@@ -583,7 +635,7 @@ document.addEventListener('keydown', e => {
 });
 
 // ========================================================
-// 11. 移动端触控
+// 12. 移动端触控
 // ========================================================
 let touchStartX = 0, touchStartY = 0;
 gameContainer.addEventListener('touchstart', e => {
@@ -612,7 +664,7 @@ gameContainer.addEventListener('touchend', e => {
 }, { passive: true });
 
 // ========================================================
-// 12. 按钮事件
+// 13. 按钮事件
 // ========================================================
 const restart = () => {
   game.hideOverlays();
@@ -627,7 +679,27 @@ continueBtn.addEventListener('click', () => {
   game.won = false;
 });
 
+/* ---- 音乐开关 ---- */
+musicBtn.addEventListener('click', toggleMusic);
+
+/* ---- 分享按钮 ---- */
+shareBtn.addEventListener('click', () => {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('✅ 网址已复制在剪切板中！');
+  }).catch(() => {
+    // 降级方案
+    const textarea = document.createElement('textarea');
+    textarea.value = url;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast('✅ 网址已复制在剪切板中！');
+  });
+});
+
 // ========================================================
-// 13. 启动游戏
+// 14. 启动游戏
 // ========================================================
 const game = new Game2048();

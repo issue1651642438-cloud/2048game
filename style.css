@@ -297,6 +297,57 @@ body {
   background: #c0b0a0;
 }
 
+/* 音乐开关按钮 */
+.music-on {
+  background: #b0a090;
+}
+.music-on:hover {
+  background: #c0b0a0;
+}
+.music-off {
+  background: #d0c8b8 !important;
+  opacity: 0.6;
+}
+.music-off:hover {
+  background: #e0d8c8 !important;
+}
+
+/* 分享按钮 */
+.share-btn {
+  background: #b0a090;
+}
+.share-btn:hover {
+  background: #c0b0a0;
+}
+
+/* Toast 提示 */
+.toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  z-index: 999;
+  animation: toast-in 0.3s ease, toast-out 0.3s ease 1.7s forwards;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@keyframes toast-in {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes toast-out {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+
 /* ===================================================
    游戏网格
    =================================================== */
