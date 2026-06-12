@@ -46,12 +46,33 @@ const shareBtn         = $('share-btn');
 const toastEl          = $('toast');
 
 // =========================================================
-// 3. 页面加载时强制登出（无论之前是否登录过）
+// 3. iOS / 移动端视口高度适配
+// =========================================================
+function fixMobileViewport() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+fixMobileViewport();
+window.addEventListener('resize', fixMobileViewport);
+
+// 游戏容器尺寸变化时重新渲染
+let _resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (game && game.cells && game.cells.length > 0) {
+      game._render();
+    }
+  }, 200);
+});
+
+// =========================================================
+// 4. 页面加载时强制登出（无论之前是否登录过）
 // =========================================================
 auth.signOut();
 
 // =========================================================
-// 4. Auth 选项卡
+// 5. Auth 选项卡
 // =========================================================
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -65,7 +86,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // =========================================================
-// 5. 认证方法
+// 6. 认证方法
 // =========================================================
 
 /* ---- 登录 ---- */
@@ -149,7 +170,7 @@ auth.onAuthStateChanged(user => {
 });
 
 // =========================================================
-// 6. 音效管理器 (Web Audio API)
+// 7. 音效管理器 (Web Audio API)
 // =========================================================
 const SoundFX = {
   _ctx: null,
@@ -237,7 +258,7 @@ const SoundFX = {
 };
 
 // =========================================================
-// 7. 背景音乐
+// 8. 背景音乐
 // =========================================================
 const bgMusic = new Audio('./gin120_ed2-mr-raindrop.mp3');
 bgMusic.loop = true;
@@ -276,7 +297,7 @@ document.addEventListener('click', initAudio, { once: true });
 document.addEventListener('keydown', initAudio, { once: true });
 
 // =========================================================
-// 8. Toast 提示
+// 9. Toast 提示
 // =========================================================
 let toastTimer = null;
 function showToast(msg) {
@@ -293,7 +314,7 @@ function showToast(msg) {
 }
 
 // ========================================================
-// 9. 方块身份 Cell（用于平滑动画追踪）
+// 10. 方块身份 Cell（用于平滑动画追踪）
 // ========================================================
 let _nextCellId = 0;
 class Cell {
@@ -304,7 +325,7 @@ class Cell {
 }
 
 // ========================================================
-// 10. 2048 游戏
+// 11. 2048 游戏
 // ========================================================
 const SIZE = 4;
 const TILE_CLASSES = [
@@ -620,7 +641,7 @@ class Game2048 {
 }
 
 // ========================================================
-// 11. 键盘控制
+// 12. 键盘控制
 // ========================================================
 document.addEventListener('keydown', e => {
   const map = {
@@ -635,7 +656,7 @@ document.addEventListener('keydown', e => {
 });
 
 // ========================================================
-// 12. 移动端触控
+// 13. 移动端触控
 // ========================================================
 let touchStartX = 0, touchStartY = 0;
 gameContainer.addEventListener('touchstart', e => {
@@ -664,7 +685,7 @@ gameContainer.addEventListener('touchend', e => {
 }, { passive: true });
 
 // ========================================================
-// 13. 按钮事件
+// 14. 按钮事件
 // ========================================================
 const restart = () => {
   game.hideOverlays();
@@ -700,6 +721,6 @@ shareBtn.addEventListener('click', () => {
 });
 
 // ========================================================
-// 14. 启动游戏
+// 15. 启动游戏
 // ========================================================
 const game = new Game2048();
