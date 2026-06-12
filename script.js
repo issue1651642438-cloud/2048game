@@ -160,6 +160,8 @@ auth.onAuthStateChanged(user => {
     gameSection.classList.remove('hidden');
     userInfo.textContent = user.isAnonymous ? '👤 访客' : `👤 ${user.email}`;
     bestScoreEl.textContent = best;
+    // 进入游戏时提前初始化音效，确保移动时音效就绪
+    SoundFX.init();
     game.start();
   } else {
     authSection.classList.remove('hidden');
@@ -200,11 +202,11 @@ const SoundFX = {
       const o = this._ctx.createOscillator();
       const g = this._ctx.createGain();
       o.connect(g); g.connect(this._ctx.destination);
-      o.type = 'sine'; o.frequency.value = 180;
-      g.gain.setValueAtTime(0.08, this._ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + 0.04);
-      o.start(); o.stop(this._ctx.currentTime + 0.04);
-    } catch (_) { /* 忽略音频错误 */ }
+      o.type = 'triangle'; o.frequency.value = 200;
+      g.gain.setValueAtTime(0.5, this._ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + 0.06);
+      o.start(); o.stop(this._ctx.currentTime + 0.06);
+    } catch (_) {}
   },
 
   /** 合并音 — 上扬的 pop 声 */
@@ -215,11 +217,11 @@ const SoundFX = {
       const g = this._ctx.createGain();
       o.connect(g); g.connect(this._ctx.destination);
       o.type = 'sine';
-      o.frequency.setValueAtTime(260, this._ctx.currentTime);
-      o.frequency.exponentialRampToValueAtTime(520, this._ctx.currentTime + 0.1);
-      g.gain.setValueAtTime(0.12, this._ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + 0.12);
-      o.start(); o.stop(this._ctx.currentTime + 0.12);
+      o.frequency.setValueAtTime(300, this._ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(600, this._ctx.currentTime + 0.12);
+      g.gain.setValueAtTime(0.5, this._ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + 0.15);
+      o.start(); o.stop(this._ctx.currentTime + 0.15);
     } catch (_) {}
   },
 
@@ -231,11 +233,11 @@ const SoundFX = {
       const g = this._ctx.createGain();
       o.connect(g); g.connect(this._ctx.destination);
       o.type = 'sawtooth';
-      o.frequency.setValueAtTime(350, this._ctx.currentTime);
-      o.frequency.exponentialRampToValueAtTime(100, this._ctx.currentTime + 0.5);
-      g.gain.setValueAtTime(0.08, this._ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + 0.5);
-      o.start(); o.stop(this._ctx.currentTime + 0.5);
+      o.frequency.setValueAtTime(400, this._ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(80, this._ctx.currentTime + 0.6);
+      g.gain.setValueAtTime(0.35, this._ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + 0.6);
+      o.start(); o.stop(this._ctx.currentTime + 0.6);
     } catch (_) {}
   },
 
@@ -249,9 +251,9 @@ const SoundFX = {
         o.connect(g); g.connect(this._ctx.destination);
         o.type = 'sine'; o.frequency.value = freq;
         const t = this._ctx.currentTime + i * 0.15;
-        g.gain.setValueAtTime(0.1, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-        o.start(t); o.stop(t + 0.3);
+        g.gain.setValueAtTime(0.4, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        o.start(t); o.stop(t + 0.35);
       });
     } catch (_) {}
   }
@@ -651,6 +653,8 @@ document.addEventListener('keydown', e => {
   const dir = map[e.key];
   if (dir) {
     e.preventDefault();
+    // 确保音效上下文已激活
+    SoundFX._ensure();
     game.move(dir);
   }
 });
@@ -681,6 +685,7 @@ gameContainer.addEventListener('touchend', e => {
   } else {
     dir = dy > 0 ? 'down' : 'up';
   }
+  SoundFX._ensure();
   game.move(dir);
 }, { passive: true });
 
